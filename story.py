@@ -346,6 +346,7 @@ def generate_responses(scrap_dict):
             # print(response_dict)
             # print(type(response_dict))
         except Exception as e:
+            response_dict["section_dump"] = scrap_dict[heading]
             continue
 
         
