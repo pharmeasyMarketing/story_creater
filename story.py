@@ -590,7 +590,7 @@ def bulk_upload(urls_list):
             save_data_to_mysql(responses)
         else:
             st.error("Data extraction failed.")
-            time.sleep(20)                
+            # time.sleep(20)                
 
                        
 
