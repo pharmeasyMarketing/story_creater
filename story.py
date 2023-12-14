@@ -530,11 +530,11 @@ def main_format(scrap_result, url):
 
         if extract_idetifier(url) == 'blog':
             response_dict = {}
-            response_dict['title'] = improve_story_title(section['title'], url)
+            response_dict['title'] = improve_story_title(section['title'], url).strip('"')
             response_dict['section_dump'] = section['section_dump']
             response_dict['Title_Image'] = scrape_title_img(url)
             response_dict['Reviewed_by'] = extract_drname(url)
-            response_dict['slug'] = slug_creater(section['title']).strip('"')
+            response_dict['slug'] = slug_creater(section['title'])
             response_dict['target_page1'] = blog_slug_trimming(url)
             response_dict['page_type'] = 'blog'
             response_dict['status'] = 'draft'
