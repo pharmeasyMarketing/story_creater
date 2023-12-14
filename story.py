@@ -245,18 +245,18 @@ def scrape_title_img(url):
                     return img_link
                 else:
                     print(f"No image found with class: {img_class}")
-                    return None
+                    return fallback_images()
 
             else:
                 print(f"Error: Unable to fetch the webpage. Status code: {response.status_code}")
-                return None
+                return fallback_images()
 
         except Exception as e:
             print(f"Error: {e}")
-            return None
+            return fallback_images()
         
     if extract_idetifier(url) == 'online-medicine-order':
-        return scrape_image_src_med(url)
+        return med_img_fallback()
     
 
 def improve_med_title(title):
@@ -422,24 +422,6 @@ def scrap_url_title(url):
         print(f"Error: {e}")
         return None
 
-def improve_story_title(heading, main_title):
- 
-    prompt = f'''You are an SEO expert: 
-    
-    - Gain a thorough understanding of the primary keyword addressed in the title: Title: {main_title}.
-    - Ensure that the heading "{heading}" aligns with the main topic keyword; if not, rephrase it using the main title keyword.
-    - If the heading already includes the main title keyword, retain it without modification. 
-    - Also the output should only contains the output; no explanation should be there.
-    '''
-
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=150,
-        temperature=0.2,
-    )
-    generated_text = response['choices'][0]['text']
-    return (generated_text).strip()
 
 def scrape_h1_text(url):
     try:
@@ -475,6 +457,7 @@ def improve_story_title(heading, url):
 - the heading should be in under 15 words.
 - the improved heading should only be related to current heading. it should not include any extra context, but only the main topic.
 For the given heading "{heading}" and main title "{main_title}", create an improved title that aligns with the main title keyword.
+- strictly do not add things like "Improved Title: "Pomegranate Uses for Health" simple return main title that you created in this, thot should be "Pomegranate uses for health" only take this as an example.
 
 '''
     response = openai.Completion.create(
