@@ -526,7 +526,7 @@ def main_format(scrap_result, url):
                 image = f"image{index+1}"
                 response_dict[heading1] = heading2
                 response_dict[description1] = description2
-                response_dict[image] = scrape_image_src_med(url)
+                response_dict[image] = med_img_fallback()
 
         if extract_idetifier(url) == 'blog':
             response_dict = {}
@@ -570,6 +570,22 @@ def fallback_images():
     return random_choice_str
 
 
+def med_img_fallback():
+    images_list = [
+        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1169699956-1.jpg",
+        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1463056853-1.jpg",
+        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_376019317-1.jpg",
+        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2195278149-1.jpg",
+        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2153117043-1.jpg",
+        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2243874667-1.jpg",
+        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_725473423-1.jpg",
+        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_294860387-1.jpg",
+        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2297314893-1.jpg"
+    ]
+
+    random_choice = random.choice(images_list)
+    random_choice_str = random_choice[0]
+    return random_choice_str
 # responses = generate_responses(result)
 # print(responses)
 
@@ -581,7 +597,7 @@ def main():
     # Sidebar
     st.sidebar.header("Settings")
     # webpage_url = st.sidebar.text_input("Enter Webpage URL:")
-    openai_key = st.sidebar.text_input("Enter Your OPENAI API Key", type="password")
+    openai_key = st.sidebar.text_input("Enter your open Ai key")
     openai.api_key = openai_key
 
     file = st.sidebar.file_uploader("Upload a CSV file containing Blog and Med PDP urls in URLs coloumn for bulk upload", type=["csv"])
@@ -610,7 +626,7 @@ def main():
                         save_data_to_mysql(responses)
                     else:
                         st.error("Data extraction failed.")
-                    time.sleep(10)    
+                    time.sleep(10)      
         st.success("Process Done")                
     # else:
     #     st.write("Upload CSV file in correct format")
