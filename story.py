@@ -347,6 +347,7 @@ def generate_responses(scrap_dict):
             # print(type(response_dict))
         except Exception as e:
             response_dict["section_dump"] = scrap_dict[heading]
+
             continue
 
         
@@ -596,7 +597,8 @@ def main():
     
     
             for i in range(0,len(urls_list)): 
-                
+                    openai.api_key = openai_key
+
                     result = extract_data(urls_list[i])
 
                     if result:
