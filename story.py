@@ -373,7 +373,7 @@ def save_data_to_mysql(data_list):
             conn = mysql.connector.connect(
                 host="srv1258.hstgr.io",
                 user="u100889959_magicbytes",
-                password="Magicbyte@49",
+                password="F#sWhh#i4",
                 database="u100889959_magicbytes"
             )
 
