@@ -583,7 +583,7 @@ def med_img_fallback():
         "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2297314893-1.jpg"
     ]
 
-    random_choice = random.choice(images_list)
+    random_choice = random.choices(images_list)
     random_choice_str = random_choice[0]
     return random_choice_str
 # responses = generate_responses(result)
