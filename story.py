@@ -353,8 +353,8 @@ def main():
     # Sidebar
     st.sidebar.header("Settings")
     webpage_url = st.sidebar.text_input("Enter Webpage URL:")
-    openai_key = st.sidebar.text_input("Enter your open Ai key")
-    openai.api_key = openai_key
+    user_api_key =  st.sidebar.text_input("Enter Your OPENAI API Key", type="password")
+    openai.api_key = user_api_key
 
     if st.sidebar.button("Extract Data"):
         result = extract_data_from_webpage(webpage_url)
