@@ -4,7 +4,6 @@ import openai
 import streamlit as st
 import re
 import mysql.connector
-openai.api_key = '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'
 
 
 def extract_data_from_webpage(url):
@@ -354,6 +353,9 @@ def main():
     # Sidebar
     st.sidebar.header("Settings")
     webpage_url = st.sidebar.text_input("Enter Webpage URL:")
+    openai_key = st.sidebar.text_input("Enter your open Ai key")
+    openai.api_key = openai_key
+
     if st.sidebar.button("Extract Data"):
         result = extract_data_from_webpage(webpage_url)
 
