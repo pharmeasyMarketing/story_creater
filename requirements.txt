@@ -1,6 +1,7 @@
 requests
-BeautifulSoup
-openai
+beautifulsoup4
+bs4
+openai==0.28
 streamlit
 re
 mysql.connector
