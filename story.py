@@ -262,7 +262,7 @@ def improve_med_title(title):
     prompt = f'''Given the heading:
     "{title}"
 
-Please provide a brief and clear response by extracting the main keyword from the given heading. For example, if the title is "Ecosprin 75mg Strip Of 14 Tablets," respond with something like "Know more about Ecosprin 75mg tablet." Avoid including additional information like "Main keyword: Ecosprin 75mg" only return the main keyword without extra details.
+Please provide a brief and clear response by extracting the main keyword from the given heading. For example, if the title is "Ecosprin 75mg Strip Of 14 Tablets," respond with something like "Know more about Ecosprin 75mg tablet" Avoid including additional information like "Main keyword: Ecosprin 75mg" only return the main keyword without extra details.
 '''
 
 
