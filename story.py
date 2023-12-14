@@ -534,7 +534,7 @@ def main_format(scrap_result, url):
             response_dict['section_dump'] = section['section_dump']
             response_dict['Title_Image'] = scrape_title_img(url)
             response_dict['Reviewed_by'] = extract_drname(url)
-            response_dict['slug'] = slug_creater(section['title'])
+            response_dict['slug'] = slug_creater(section['title']).strip('"')
             response_dict['target_page1'] = blog_slug_trimming(url)
             response_dict['page_type'] = 'blog'
             response_dict['status'] = 'draft'
@@ -626,7 +626,7 @@ def main():
                         save_data_to_mysql(responses)
                     else:
                         st.error("Data extraction failed.")
-                    time.sleep(10)      
+                    time.sleep(20)      
         st.success("Process Done")                
     # else:
     #     st.write("Upload CSV file in correct format")
