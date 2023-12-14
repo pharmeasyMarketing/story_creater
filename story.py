@@ -580,7 +580,7 @@ def main():
     # Sidebar
     st.sidebar.header("Settings")
     # webpage_url = st.sidebar.text_input("Enter Webpage URL:")
-    openai_key = st.sidebar.text_input("Enter your open Ai key")
+    openai_key = st.sidebar.text_input("Enter Your OPENAI API Key", type="password")
     openai.api_key = openai_key
 
     file = st.sidebar.file_uploader("Upload a CSV file containing Blog and Med PDP urls in URLs coloumn for bulk upload", type=["csv"])
