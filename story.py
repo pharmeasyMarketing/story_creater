@@ -6,6 +6,7 @@ import re
 import mysql.connector
 import pandas as pd
 import random
+import time
 
 def med_extract(url):
     response = requests.get(url)
@@ -609,6 +610,7 @@ def main():
                         save_data_to_mysql(responses)
                     else:
                         st.error("Data extraction failed.")
+                    time.sleep(10)    
         st.success("Process Done")                
     # else:
     #     st.write("Upload CSV file in correct format")
