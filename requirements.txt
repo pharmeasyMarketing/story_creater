@@ -1,0 +1,6 @@
+requests
+BeautifulSoup
+openai
+streamlit
+re
+mysql.connector
