@@ -574,6 +574,26 @@ def med_img_fallback():
 # responses = generate_responses(result)
 # print(responses)
 
+def bulk_upload(urls_list):
+    for i in range(0,len(urls_list)): 
+
+        result = extract_data(urls_list[i])
+
+        if result:
+            st.success("Data extraction successful!")
+                            
+            responses = main_format(result, urls_list[i])
+            st.write("Generated Responses:")
+            st.write(responses)
+                        
+
+            save_data_to_mysql(responses)
+        else:
+            st.error("Data extraction failed.")
+            time.sleep(20)                
+
+                       
+
 def main():
     # st.set_theme("dark")
 
@@ -591,28 +611,9 @@ def main():
 
         urls_list = df['URLs'].tolist()
 
-    
+
         with st.spinner("Processing data..."):
-        
-    
-    
-            for i in range(0,len(urls_list)): 
-                    openai.api_key = openai_key
-
-                    result = extract_data(urls_list[i])
-
-                    if result:
-                        st.success("Data extraction successful!")
-                        
-                        responses = main_format(result, urls_list[i])
-                        st.write("Generated Responses:")
-                        st.write(responses)
-                    
-
-                        save_data_to_mysql(responses)
-                    else:
-                        st.error("Data extraction failed.")
-                    time.sleep(20)      
+            bulk_upload(urls_list)
         st.success("Process Done")                
     # else:
     #     st.write("Upload CSV file in correct format")
