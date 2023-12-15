@@ -539,14 +539,14 @@ def main_format(scrap_result, url):
 
 def fallback_images():
     images_list = [
-    "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2025006328-1.jpg",
-    "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2036645162-1.jpg",
-    "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1739736104-1.jpg",
-    "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1966439416-1.jpg",
-    "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_339708269-1.jpg",
-    "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2294489191-1.jpg",
-    "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2259314129-1.jpg",
-    "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2200138025-1.jpg"
+    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2025006328-1.jpg",
+    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2036645162-1.jpg",
+    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1739736104-1.jpg",
+    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1966439416-1.jpg",
+    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_339708269-1.jpg",
+    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2294489191-1.jpg",
+    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2259314129-1.jpg",
+    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2200138025-1.jpg"
 ]
     random_choice = random.choices(images_list)
     # print(type(random_choice))
@@ -557,15 +557,15 @@ def fallback_images():
 
 def med_img_fallback():
     images_list = [
-        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1169699956-1.jpg",
-        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1463056853-1.jpg",
-        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_376019317-1.jpg",
-        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2195278149-1.jpg",
-        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2153117043-1.jpg",
-        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2243874667-1.jpg",
-        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_725473423-1.jpg",
-        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_294860387-1.jpg",
-        "http://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2297314893-1.jpg"
+        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1169699956-1.jpg",
+        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1463056853-1.jpg",
+        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_376019317-1.jpg",
+        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2195278149-1.jpg",
+        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2153117043-1.jpg",
+        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2243874667-1.jpg",
+        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_725473423-1.jpg",
+        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_294860387-1.jpg",
+        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2297314893-1.jpg"
     ]
 
     random_choice = random.choices(images_list)
