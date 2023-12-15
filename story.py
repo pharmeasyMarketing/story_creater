@@ -597,7 +597,7 @@ def bulk_upload(urls_list):
 def main():
     # st.set_theme("dark")
 
-    st.title("PharmEasy Story Creater")
+    st.title("PharmEasy Story Creator")
 
     # Sidebar
     st.sidebar.header("Settings")
