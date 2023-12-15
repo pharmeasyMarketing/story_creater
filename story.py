@@ -496,7 +496,7 @@ def main_format(scrap_result, url):
             response_dict = {}
             response_dict['title'] = improve_med_title(section['title'])
             response_dict['section_dump'] = section['section_dump']
-            response_dict['Title_Image'] = scrape_image_src_med(url)
+            response_dict['Title_Image'] = med_img_fallback()
             response_dict['Reviewed_by'] = scrape_medauthor_name(url)
             response_dict['slug'] = slug_creater(section['title'])
             response_dict['target_page1'] = url
@@ -590,7 +590,7 @@ def bulk_upload(urls_list):
             save_data_to_mysql(responses)
         else:
             st.error("Data extraction failed.")
-            # time.sleep(20)                
+            time.sleep(20)                
 
                        
 
