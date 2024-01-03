@@ -372,9 +372,9 @@ def save_data_to_mysql(data_list):
             table = "stories"
             conn = mysql.connector.connect(
                 host="srv1258.hstgr.io",
-                user="u100889959_magicbytes",
-                password="F#sWhh#i4",
-                database="u100889959_magicbytes"
+                user="u914396707_story",
+                password="Hostinger@123.",
+                database="u914396707_story"
             )
 
             cursor = conn.cursor()
