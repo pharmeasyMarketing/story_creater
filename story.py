@@ -298,7 +298,7 @@ def generate_responses(scrap_dict):
         prompt = f'''Imagine you are a medical professional. Follow these steps:
   1. Carefully read the provided text: "{text_to_sent}".
   2. Generate up to five headings based on the given text. Feel free to create fewer if only three headings seem appropriate.
-  3. For each heading you create, write a description of 10 to 20 words, strictly don't write large descriptions.
+  3. For each heading you create, write a description of 20 to 30 words, strictly don't write large descriptions.
   4. Finally, provide your response in the format of a Python dictionary, where each heading corresponds to its respective description, For example this is the ideal format : "{ideal_format}" this is just an example don't read it as reference only take it as a response format example, strictly return response in this pattern only
 '''
         try:
@@ -494,7 +494,7 @@ def main_format(scrap_result, url):
     for section in responses:
         if extract_idetifier(url) == "online-medicine-order":
             response_dict = {}
-            response_dict['title'] = improve_med_title(section['title'])
+            response_dict['title'] = section['title']
             response_dict['section_dump'] = section['section_dump']
             response_dict['Title_Image'] = med_img_fallback()
             response_dict['Reviewed_by'] = scrape_medauthor_name(url)
@@ -515,7 +515,8 @@ def main_format(scrap_result, url):
 
         if extract_idetifier(url) == 'blog':
             response_dict = {}
-            response_dict['title'] = improve_story_title(section['title'], url).strip('"')
+            response_dict['title'] = section['title']
+            response_dict['Blog_Source_Title'] = scrap_url_title(url)
             response_dict['section_dump'] = section['section_dump']
             response_dict['Title_Image'] = scrape_title_img(url)
             response_dict['Reviewed_by'] = extract_drname(url)
@@ -539,14 +540,14 @@ def main_format(scrap_result, url):
 
 def fallback_images():
     images_list = [
-    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2025006328-1.jpg",
-    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2036645162-1.jpg",
-    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1739736104-1.jpg",
-    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1966439416-1.jpg",
-    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_339708269-1.jpg",
-    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2294489191-1.jpg",
-    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2259314129-1.jpg",
-    "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2200138025-1.jpg"
+    "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_2025006328-1.jpg",
+    "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_1739736104-1.jpg",
+    "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_2036645162-1.jpg",
+    "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_1966439416-1.jpg",
+    "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_339708269-1.jpg",
+    "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_2294489191-1.jpg",
+    "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_2259314129-1.jpg",
+    "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_2200138025-1.jpg"
 ]
     random_choice = random.choices(images_list)
     # print(type(random_choice))
@@ -557,15 +558,15 @@ def fallback_images():
 
 def med_img_fallback():
     images_list = [
-        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1169699956-1.jpg",
-        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_1463056853-1.jpg",
-        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_376019317-1.jpg",
-        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2195278149-1.jpg",
-        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2153117043-1.jpg",
-        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2243874667-1.jpg",
-        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_725473423-1.jpg",
-        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_294860387-1.jpg",
-        "https://magicbyte.co/wp-content/uploads/2023/12/shutterstock_2297314893-1.jpg"
+        "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_1169699956-1.jpg",
+        "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_1463056853-1.jpg",
+        "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_376019317-1.jpg",
+        "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_2195278149-1.jpg",
+        "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_2153117043-1.jpg",
+        "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_2243874667-1.jpg",
+        "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_725473423-1.jpg",
+        "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_294860387-1.jpg",
+        "https://pharmeasy.in/story/wp-content/uploads/2023/12/shutterstock_2297314893-1.jpg"
     ]
 
     random_choice = random.choices(images_list)
@@ -587,7 +588,7 @@ def bulk_upload(urls_list):
             st.write(responses)
                         
 
-            save_data_to_mysql(responses)
+            # save_data_to_mysql(responses)
         else:
             st.error("Data extraction failed.")
             time.sleep(20)                
@@ -606,15 +607,16 @@ def main():
     openai.api_key = openai_key
 
     file = st.sidebar.file_uploader("Upload a CSV file containing Blog and Med PDP urls in URLs coloumn for bulk upload", type=["csv"])
-    if file is not None:
-        df = pd.read_csv(file)
+    if st.sidebar.button("Create Stories"):
+        if file is not None:
+            df = pd.read_csv(file)
 
-        urls_list = df['URLs'].tolist()
+            urls_list = df['URLs'].tolist()
 
 
-        with st.spinner("Processing data..."):
-            bulk_upload(urls_list)
-        st.success("Process Done")                
+            with st.spinner("Processing data..."):
+                bulk_upload(urls_list)
+            st.success("Process Done")                
     # else:
     #     st.write("Upload CSV file in correct format")
 
