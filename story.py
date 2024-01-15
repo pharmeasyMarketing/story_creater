@@ -824,19 +824,21 @@ def main():
     st.sidebar.header("Settings")
     # webpage_url = st.sidebar.text_input("Enter Webpage URL:")
     openai_key = st.sidebar.text_input("Enter your open Ai key", type = "password")
-    openai.api_key = openai_key
 
     file = st.sidebar.file_uploader("Upload a CSV file containing Blog and Med PDP urls in URLs coloumn for bulk upload", type=["csv"])
     if st.sidebar.button("Create Stories"):
-        if file is not None:
-            df = pd.read_csv(file)
+        if openai_key:
+            openai.api_key = openai_key
 
-            urls_list = df['URLs'].tolist()
-
-
-            with st.spinner("Processing data..."):
-                bulk_upload(urls_list)
-            st.success("Process Done")                
+            if file is not None:
+                df = pd.read_csv(file)
+    
+                urls_list = df['URLs'].tolist()
+    
+    
+                with st.spinner("Processing data..."):
+                    bulk_upload(urls_list)
+                st.success("Process Done")                
     # else:
     #     st.write("Upload CSV file in correct format")
 
