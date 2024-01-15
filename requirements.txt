@@ -5,3 +5,5 @@ openai==0.28
 streamlit
 mysql.connector
 pandas
+pil
+tempfile
