@@ -50,10 +50,10 @@ def extract_data_from_webpage(url):
             for index, h2_tag in enumerate(h2_tags):
                 h2_text = h2_tag.get_text().strip()
 
-                if h2_text.lower() == "introduction" or h2_text.lower() == "key highlights:" or h2_text.lower() == "conclusion":
+                if h2_text.lower() == "introduction" or h2_text.lower() == "key highlights:" or h2_text.lower() == "conclusion" or h2_text.lower() == "introduction:" or h2_text.lower() == "this might be related & helpful!": 
                     continue
 
-                if h2_text.lower() == "faqs:" or h2_text.lower() == "frequently asked questions" or h2_text.lower() == "frequently asked questions (faqs)" or h2_text.lower() == "frequently asked questions (faq)" or h2_text.lower() == "faq (frequently asked questions)":
+                if h2_text.lower() == "faqs:" or h2_text.lower() == "frequently asked questions" or h2_text.lower() == "frequently asked questions (faqs)" or h2_text.lower() == "frequently asked questions (faq)" or h2_text.lower() == "faq (frequently asked questions)" or h2_text.lower() == "frequently asked questions:":
                     break
 
                 next_sibling = h2_tag.find_next_sibling()
