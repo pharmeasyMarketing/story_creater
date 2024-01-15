@@ -7,7 +7,12 @@ import mysql.connector
 import pandas as pd
 import random
 import time
+import json
+from PIL import Image
+import io
+from tempfile import NamedTemporaryFile
 
+@st.cache_data(show_spinner=False)
 def med_extract(url):
     response = requests.get(url)
 
@@ -361,41 +366,6 @@ def generate_responses(scrap_dict):
         
     return responses_list
 
-def save_data_to_mysql(data_list):
-
-
-    for data in data_list:
-          
-        conn = None
-        cursor = None
-        try:
-            table = "stories"
-            conn = mysql.connector.connect(
-                host="srv1116.hstgr.io",
-                user="u914396707_story",
-                password="Hostinger@123.",
-                database="u914396707_story"
-            )
-
-            cursor = conn.cursor()
-
-            insert_query = f"INSERT INTO {table} ({', '.join(data.keys())}) VALUES ({', '.join(['%s']*len(data))})"
-
-            values = tuple(data.values())
-            cursor.execute(insert_query, values)
-
-            conn.commit()
-
-            st.write("Data successfully inserted into the database!")
-
-        except mysql.connector.Error as err:
-            print(f"Error: {err}")
-
-        finally:
-            if cursor is not None:
-                cursor.close()
-            if conn is not None:
-                conn.close()
 
 def scrap_url_title(url):
     
@@ -485,58 +455,7 @@ def blog_slug_trimming(url):
         return blog_part
     else:
         return None
-    
-def main_format(scrap_result, url):
-
-    responses = generate_responses(scrap_result)
-    # st.write(responses)
-    new_list = []
-    for section in responses:
-        if extract_idetifier(url) == "online-medicine-order":
-            response_dict = {}
-            response_dict['title'] = section['title']
-            response_dict['section_dump'] = section['section_dump']
-            response_dict['Title_Image'] = med_img_fallback()
-            response_dict['Reviewed_by'] = scrape_medauthor_name(url)
-            response_dict['slug'] = slug_creater(section['title'])
-            response_dict['target_page1'] = url
-            response_dict['page_type'] = 'medicine'
-            response_dict['status'] = 'draft'
-            section.popitem()
-            section.popitem()
-            for index, (heading2, description2) in enumerate(section.items()):
-                keyword = generate_keyword(heading2)
-                heading1 = f"heading{index + 1}"
-                description1 = f"description{index + 1}"
-                image = f"image{index+1}"
-                response_dict[heading1] = heading2
-                response_dict[description1] = description2
-                response_dict[image] = med_img_fallback()
-
-        if extract_idetifier(url) == 'blog':
-            response_dict = {}
-            response_dict['title'] = section['title']
-            response_dict['Blog_Source_Title'] = scrap_url_title(url)
-            response_dict['section_dump'] = section['section_dump']
-            response_dict['Title_Image'] = scrape_title_img(url)
-            response_dict['Reviewed_by'] = extract_drname(url)
-            response_dict['slug'] = slug_creater(section['title'])
-            response_dict['target_page1'] = blog_slug_trimming(url)
-            response_dict['page_type'] = 'blog'
-            response_dict['status'] = 'draft'
-            section.popitem()
-            section.popitem()
-            for index, (heading2, description2) in enumerate(section.items()):
-                keyword = generate_keyword(heading2)
-                heading1 = f"heading{index + 1}"
-                description1 = f"description{index + 1}"
-                image = f"image{index+1}"
-                response_dict[heading1] = heading2
-                response_dict[description1] = description2
-                response_dict[image] = images(keyword)
-
-        new_list.append(response_dict)
-    return new_list        
+          
 
 def fallback_images():
     images_list = [
@@ -575,6 +494,273 @@ def med_img_fallback():
 # responses = generate_responses(result)
 # print(responses)
 
+# -------------------------------- midjouney images start --------------------------------------------
+
+BASE_URL = "https://api.thenextleg.io/v2"
+AUTH_TOKEN = "65f250e1-1499-4c2f-967a-8251c7d05ad8"
+AUTH_HEADERS = {
+    "Authorization": f"Bearer {AUTH_TOKEN}",
+    "Content-Type": "application/json",
+}
+
+
+def sleep(milliseconds):
+    time.sleep(milliseconds / 1000)
+
+@st.cache_data(show_spinner=False)
+def fetch_to_completion(message_id, retry_count, max_retry=20):
+    image_res = requests.get(f"{BASE_URL}/message/{message_id}", headers=AUTH_HEADERS)
+    image_response_data = image_res.json()
+
+    if image_response_data["progress"] == 100:
+        return image_response_data
+
+    if image_response_data["progress"] == "incomplete":
+        raise Exception("Image generation failed")
+
+    if retry_count > max_retry:
+        raise Exception("Max retries exceeded")
+
+    # if image_response_data["progress"] and image_response_data["progressImageUrl"]:
+    #     print("---------------------")
+    #     print(f'Progress: {image_response_data["progress"]}%')
+    #     print(f'Progress Image Url: {image_response_data["progressImageUrl"]}')
+    #     print("---------------------")
+
+    sleep(10000)
+    return fetch_to_completion(message_id, retry_count + 1)
+
+@st.cache_data(show_spinner=False)
+def generate_image(prompt):
+    try:
+        image_res = requests.post(
+            f"{BASE_URL}/imagine", headers=AUTH_HEADERS, json={"msg": prompt}
+        )
+        image_res.raise_for_status()  # Check for HTTP errors
+
+        image_response_data = image_res.json()
+        message_id = image_response_data.get("messageId")
+
+        if message_id:
+            completed_image_data = fetch_to_completion(message_id, 0)
+
+            image_urls = completed_image_data['response']['imageUrls']
+            return image_urls
+        else:
+            print("Error: 'messageId' not found in API response")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error making API request: {e}")
+    # try:
+    #     image_res = requests.post(
+    #         f"{BASE_URL}/imagine", headers=AUTH_HEADERS, json={"msg": prompt}
+    #     )
+    #     image_response_data = image_res.json()
+
+    #     completed_image_data = fetch_to_completion(image_response_data["messageId"], 0)
+
+    #     # variation_res = requests.post(
+    #     #     f"{BASE_URL}/button",
+    #     #     headers=AUTH_HEADERS,
+    #     #     json={
+    #     #         "button": "V1",
+    #     #         "buttonMessageId": completed_image_data["response"]["buttonMessageId"],
+    #     #     },
+    #     # )
+    #     # variation_response_data = variation_res.json()
+    #     # completed_variation_data = fetch_to_completion(
+    #     #     variation_response_data["messageId"], 0
+    #     # )
+    #     image_urls = completed_image_data['response']['imageUrls']
+    #     return image_urls
+
+    # except requests.exceptions.RequestException as e:
+    #     # print(f"Error making API request: {e}")
+    #     return "image not found"
+            
+
+
+@st.cache_data(show_spinner=False)
+def generate_image_prompt(main_title, sub_title):
+
+    prompt = f'''
+    main title = "{main_title}"
+    subtitle = "{sub_title}" 
+
+    Need a detailed prompt for midjourney AI service to portray a central idea depicted by the combination of above titles which would be related to healthcare, the image needs to be photorealistic, including real people or real objects. Don't directly quote any of the above titles in the prompt. Directly just output the exact prompt in plain text, no other detail or explanation is needed.
+    '''
+    # prompt = f" Imagine operating an online platform focused on delivering healthcare information through blogs. To enhance the content, I aim to generate images using AI. Your task is to formulate a prompt that effectively conveys the need for generating images related to healthcare information on the platform. Please craft a suitable prompt using the given description: '{desc}'."
+    gpt_response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content":  prompt,
+            },
+                
+        ],
+        max_tokens=200,
+        n=1,
+        stop=None,
+        temperature=0.2,
+        )
+    
+    response = gpt_response["choices"][0]["message"]["content"].strip()
+    response = response
+    return response
+@st.cache_data(show_spinner=False)
+
+def retreive_img_bytes(image_url):
+    url = "https://api.thenextleg.io/getImage"
+
+    payload = json.dumps({
+        "imgUrl": image_url
+    })
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/arraybuffer',
+        'Authorization': 'Bearer 65f250e1-1499-4c2f-967a-8251c7d05ad8'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    binary_data = response.content
+    image_stream = io.BytesIO(binary_data)
+    binary = binary_data = image_stream.getvalue()
+    return binary
+
+@st.cache_data(show_spinner=False)
+def post_image_wordpress(username, password, site_url, binary_data):
+    auth = (username, password)
+    image_extension = "jpg"  # Change to the appropriate image extension
+    
+    with NamedTemporaryFile(delete=False, mode="wb", suffix=f".{image_extension}") as temp_file:
+        temp_file.write(binary_data)
+        temp_file_path = temp_file.name
+
+    media_endpoint = f"{site_url}/wp-json/wp/v2/media"
+    headers = {
+        'Content-Disposition': f'attachment; filename=image.{image_extension}',
+    }
+
+    files = {'file': (f'image.{image_extension}', open(temp_file_path, 'rb'))}
+
+    try:
+        response = requests.post(media_endpoint, auth=auth, headers=headers, files=files)
+
+        if response.status_code == 201:
+            media_data = response.json()
+            media_id = media_data['id']
+            media_url = media_data['guid']['rendered']
+            
+            # print(f"Image uploaded successfully. Media ID: {media_id}")
+            # print(f"Media URL: {media_url}")
+            return media_url
+        else:
+            print(f"Failed to upload image. Status code: {response.status_code}, Response: {response.text}")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    # finally:
+    #     os.remove(temp_file_path)
+
+@st.cache_data(show_spinner=False)
+def generate_final_wordressl_ink(main_title, sub_title):
+    image_prompt = (generate_image_prompt(main_title, sub_title))
+    print(image_prompt)
+    image_url_list = generate_image(image_prompt + " --ar 9:16")
+    # image_url = random.choice(image_url_list)
+    wordpress_img_url_list = []
+    if image_url_list is None:
+        return 0
+    else:
+        for image_url in image_url_list:
+            binary_data = retreive_img_bytes(image_url)
+            username = 'sarthak'
+            password = 'uwrM 9UeW QF0n 5wGw nlWk Ye55'
+            site_url = 'https://pharmeasy.in/story'
+            wordpress_img_url = post_image_wordpress(username, password, site_url, binary_data)
+            wordpress_img_url_list.append(wordpress_img_url)
+        # wordpress_img_url_list = [link + ".webp" for link in wordpress_img_url_list]
+        new_wordpress_img_url_list = []
+        for link in wordpress_img_url_list:
+            try:
+                link = link + ".webp"
+                new_wordpress_img_url_list.append(link)
+            except:
+                new_wordpress_img_url_list.append("image not found")
+                
+        return new_wordpress_img_url_list
+
+# ---------------------------------midjourney imag end ---------------------------------
+@st.cache_data(show_spinner=False)
+def main_format(scrap_result, url):
+
+    responses = generate_responses(scrap_result)
+    # st.write(responses)
+    new_list = []
+    for section in responses:
+        if extract_idetifier(url) == "online-medicine-order":
+            response_dict = {}
+            response_dict['title'] = section['title']
+            response_dict['section_dump'] = section['section_dump']
+            response_dict['Title_Image'] = med_img_fallback()
+            response_dict['Reviewed_by'] = scrape_medauthor_name(url)
+            response_dict['slug'] = slug_creater(section['title'])
+            response_dict['target_page1'] = url
+            response_dict['page_type'] = 'medicine'
+            response_dict['status'] = 'draft'
+            section.popitem()
+            section.popitem()
+            for index, (heading2, description2) in enumerate(section.items()):
+                # keyword = generate_keyword(heading2)
+                heading1 = f"heading{index + 1}"
+                description1 = f"description{index + 1}"
+                image = f"image{index+1}"
+                response_dict[heading1] = heading2
+                response_dict[description1] = description2
+                response_dict[image] = med_img_fallback()
+
+        if extract_idetifier(url) == 'blog':
+            response_dict = {}
+            response_dict['title'] = section['title']
+            title = section['title']
+            response_dict['Blog_Source_Title'] = scrap_url_title(url)
+            response_dict['section_dump'] = section['section_dump']
+            response_dict['Title_Image'] = scrape_title_img(url)
+            response_dict['Reviewed_by'] = extract_drname(url)
+            response_dict['slug'] = slug_creater(section['title'])
+            response_dict['target_page1'] = blog_slug_trimming(url)
+            response_dict['page_type'] = 'blog'
+            response_dict['status'] = 'draft'
+            section.popitem()
+            section.popitem()
+            for index, (heading2, description2) in enumerate(section.items()):
+                # keyword = generate_keyword(heading2)
+
+                heading1 = f"heading{index + 1}"
+                description1 = f"description{index + 1}"
+                image_dump = f"image{index+1}_dump"
+                image = f"image{index+1}"
+                response_dict[heading1] = heading2
+                response_dict[description1] = description2
+                image_url_list = generate_final_wordressl_ink(title, heading2)
+                if image_url_list == 0:
+                    response_dict[image] = "Image not found"
+                    response_dict[image_dump] = "image not found something went wrong"
+                else:    
+                    response_dict[image] = random.choice(image_url_list)
+                    response_dict[image_dump] = ','.join(image_url_list)
+                
+
+
+        new_list.append(response_dict)
+        st.write(new_list)
+        save_data_to_mysql(new_list)
+        new_list = []
+        sleep(5000)
+    return new_list  
+
+@st.cache_data(show_spinner=False)
 def bulk_upload(urls_list):
     for i in range(0,len(urls_list)): 
 
@@ -584,16 +770,50 @@ def bulk_upload(urls_list):
             st.success("Data extraction successful!")
                             
             responses = main_format(result, urls_list[i])
-            st.write("Generated Responses:")
-            st.write(responses)
+            # st.write("Generated Responses:")
+            # st.write(responses)
                         
 
-            save_data_to_mysql(responses)
+            # save_data_to_mysql(responses)
         else:
             st.error("Data extraction failed.")
             time.sleep(20)                
 
-                       
+@st.cache_data(show_spinner=False)
+def save_data_to_mysql(data_list):
+
+    for data in data_list:
+          
+        conn = None
+        cursor = None
+        try:
+            table = "stories"
+            conn = mysql.connector.connect(
+                host="srv1116.hstgr.io",
+                user="u914396707_story",
+                password="Hostinger@123.",
+                database="u914396707_story"
+            )
+
+            cursor = conn.cursor()
+
+            insert_query = f"INSERT INTO {table} ({', '.join(data.keys())}) VALUES ({', '.join(['%s']*len(data))})"
+
+            values = tuple(data.values())
+            cursor.execute(insert_query, values)
+
+            conn.commit()
+
+            st.write("Data successfully inserted into the database!")
+
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if conn is not None:
+                conn.close()                      
 
 def main():
     # st.set_theme("dark")
