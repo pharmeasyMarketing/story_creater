@@ -587,7 +587,7 @@ def generate_image_prompt(main_title, sub_title):
     main title = "{main_title}"
     subtitle = "{sub_title}" 
 
-    Need a detailed prompt for midjourney AI service to portray a central idea depicted by the combination of above titles which would be related to healthcare, the image needs to be photorealistic, including real people or real objects. Don't directly quote any of the above titles in the prompt. Directly just output the exact prompt in plain text, no other detail or explanation is needed.
+    Need a detailed prompt for midjourney AI service to portray a central idea depicted by the combination of above titles which would be related to healthcare, the image needs to be photorealistic, including real people or real objects. Don't directly quote any of the above titles in the prompt. Make sure that the prompt excludes any form of suggestions to insert text, be it infographics, bullets, lists, headings, subheadings, words, signatures, or logos, allowing the image to speak for itself. Directly just output the exact prompt in plain text, no other detail or explanation is needed.
     '''
     # prompt = f" Imagine operating an online platform focused on delivering healthcare information through blogs. To enhance the content, I aim to generate images using AI. Your task is to formulate a prompt that effectively conveys the need for generating images related to healthcare information on the platform. Please craft a suitable prompt using the given description: '{desc}'."
     gpt_response = openai.ChatCompletion.create(
