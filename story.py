@@ -818,7 +818,6 @@ def save_data_to_mysql(data_list):
             if conn is not None:
                 conn.close()                      
 
-@st.cache_data(show_spinner=False)
 def main():
     # st.set_theme("dark")
 
