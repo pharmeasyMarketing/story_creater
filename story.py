@@ -302,7 +302,7 @@ def generate_responses(scrap_dict):
         
         prompt = f'''Imagine you are a medical professional. Follow these steps:
   1. Carefully read the provided text: "{text_to_sent}".
-  2. Generate up to five headings based on the given text. Feel free to create fewer if only three headings seem appropriate.
+  2. Generate up to ten headings based on the given text. Feel free to create fewer if only three headings seem appropriate.
   3. For each heading you create, write a description of 20 to 30 words, strictly don't write large descriptions.
   4. Finally, provide your response in the format of a Python dictionary, where each heading corresponds to its respective description, For example this is the ideal format : "{ideal_format}" this is just an example don't read it as reference only take it as a response format example, strictly return response in this pattern only
 '''
@@ -724,7 +724,10 @@ def main_format(scrap_result, url):
             response_dict = {}
             response_dict['title'] = section['title']
             title = section['title']
-            response_dict['Blog_Source_Title'] = scrap_url_title(url)
+            Blog_Source_Title = scrap_url_title(url)
+            response_dict['Blog_Source_Title'] = Blog_Source_Title
+            response_dict['identifier'] = title + Blog_Source_Title
+
             response_dict['section_dump'] = section['section_dump']
             response_dict['Title_Image'] = scrape_title_img(url)
             response_dict['Reviewed_by'] = extract_drname(url)
@@ -815,6 +818,7 @@ def save_data_to_mysql(data_list):
             if conn is not None:
                 conn.close()                      
 
+@st.cache_data(show_spinner=False)
 def main():
     # st.set_theme("dark")
 
