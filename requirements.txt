@@ -1,4 +1,4 @@
-pip==21.3.1
+pip==23.3.2
 requests
 beautifulsoup4
 bs4
