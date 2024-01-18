@@ -667,7 +667,7 @@ def post_image_wordpress(username, password, site_url, binary_data):
 def generate_final_wordressl_ink(main_title, sub_title):
     image_prompt = (generate_image_prompt(main_title, sub_title))
     print(image_prompt)
-    image_url_list = generate_image(image_prompt + " --aspect 9:16 --no text, heading, watermark, words, letters, typography, slogans, signature --v 5.2")
+    image_url_list = generate_image(image_prompt + " --aspect 9:16 --no text, heading, watermark, words, letters, typography, slogans, signature ")
     # image_url = random.choice(image_url_list)
     wordpress_img_url_list = []
     if image_url_list is None:
