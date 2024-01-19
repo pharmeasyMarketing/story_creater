@@ -9,6 +9,7 @@ import random
 import time
 import json
 from PIL import Image
+import http.client
 import io
 from tempfile import NamedTemporaryFile
 
@@ -496,61 +497,61 @@ def med_img_fallback():
 
 # -------------------------------- midjouney images start --------------------------------------------
 
-BASE_URL = "https://api.thenextleg.io/v2"
-AUTH_TOKEN = "65f250e1-1499-4c2f-967a-8251c7d05ad8"
-AUTH_HEADERS = {
-    "Authorization": f"Bearer {AUTH_TOKEN}",
-    "Content-Type": "application/json",
-}
+# BASE_URL = "https://api.thenextleg.io/v2"
+# AUTH_TOKEN = "65f250e1-1499-4c2f-967a-8251c7d05ad8"
+# AUTH_HEADERS = {
+#     "Authorization": f"Bearer {AUTH_TOKEN}",
+#     "Content-Type": "application/json",
+# }
 
 
-def sleep(milliseconds):
+def sleeep(milliseconds):
     time.sleep(milliseconds / 1000)
 
-@st.cache_data(show_spinner=False)
-def fetch_to_completion(message_id, retry_count, max_retry=20):
-    image_res = requests.get(f"{BASE_URL}/message/{message_id}", headers=AUTH_HEADERS)
-    image_response_data = image_res.json()
+# @st.cache_data(show_spinner=False)
+# def fetch_to_completion(message_id, retry_count, max_retry=20):
+#     image_res = requests.get(f"{BASE_URL}/message/{message_id}", headers=AUTH_HEADERS)
+#     image_response_data = image_res.json()
 
-    if image_response_data["progress"] == 100:
-        return image_response_data
+#     if image_response_data["progress"] == 100:
+#         return image_response_data
 
-    if image_response_data["progress"] == "incomplete":
-        raise Exception("Image generation failed")
+#     if image_response_data["progress"] == "incomplete":
+#         raise Exception("Image generation failed")
 
-    if retry_count > max_retry:
-        raise Exception("Max retries exceeded")
+#     if retry_count > max_retry:
+#         raise Exception("Max retries exceeded")
 
-    # if image_response_data["progress"] and image_response_data["progressImageUrl"]:
-    #     print("---------------------")
-    #     print(f'Progress: {image_response_data["progress"]}%')
-    #     print(f'Progress Image Url: {image_response_data["progressImageUrl"]}')
-    #     print("---------------------")
+#     # if image_response_data["progress"] and image_response_data["progressImageUrl"]:
+#     #     print("---------------------")
+#     #     print(f'Progress: {image_response_data["progress"]}%')
+#     #     print(f'Progress Image Url: {image_response_data["progressImageUrl"]}')
+#     #     print("---------------------")
 
-    sleep(10000)
-    return fetch_to_completion(message_id, retry_count + 1)
+#     sleep(10000)
+#     return fetch_to_completion(message_id, retry_count + 1)
 
-@st.cache_data(show_spinner=False)
-def generate_image(prompt):
-    try:
-        image_res = requests.post(
-            f"{BASE_URL}/imagine", headers=AUTH_HEADERS, json={"msg": prompt}
-        )
-        image_res.raise_for_status()  # Check for HTTP errors
+# @st.cache_data(show_spinner=False)
+# def generate_image(prompt):
+#     try:
+#         image_res = requests.post(
+#             f"{BASE_URL}/imagine", headers=AUTH_HEADERS, json={"msg": prompt}
+#         )
+#         image_res.raise_for_status()  # Check for HTTP errors
 
-        image_response_data = image_res.json()
-        message_id = image_response_data.get("messageId")
+#         image_response_data = image_res.json()
+#         message_id = image_response_data.get("messageId")
 
-        if message_id:
-            completed_image_data = fetch_to_completion(message_id, 0)
+#         if message_id:
+#             completed_image_data = fetch_to_completion(message_id, 0)
 
-            image_urls = completed_image_data['response']['imageUrls']
-            return image_urls
-        else:
-            print("Error: 'messageId' not found in API response")
+#             image_urls = completed_image_data['response']['imageUrls']
+#             return image_urls
+#         else:
+#             print("Error: 'messageId' not found in API response")
 
-    except requests.exceptions.RequestException as e:
-        print(f"Error making API request: {e}")
+#     except requests.exceptions.RequestException as e:
+#         print(f"Error making API request: {e}")
     # try:
     #     image_res = requests.post(
     #         f"{BASE_URL}/imagine", headers=AUTH_HEADERS, json={"msg": prompt}
@@ -577,8 +578,42 @@ def generate_image(prompt):
     # except requests.exceptions.RequestException as e:
     #     # print(f"Error making API request: {e}")
     #     return "image not found"
-            
+@st.cache_data(show_spinner=False)            
+def send_request(method, path, body=None, headers={}):
+    conn = http.client.HTTPSConnection("demo.imagineapi.dev")
+    conn.request(method, path, body=json.dumps(body) if body else None, headers=headers)
+    response = conn.getresponse()
+    data = json.loads(response.read().decode())
+    conn.close()
+    return data
 
+@st.cache_data(show_spinner=False)
+def generate_image(prompt):
+    data = {
+        "prompt": prompt,
+    }
+
+    headers = {
+        'Authorization': 'Bearer MIgP1r88ut2WSx-uygNvM_ThK9YmjwKf',  # <<<< TODO: remember to change this
+        'Content-Type': 'application/json'
+    }
+
+    prompt_response_data = send_request('POST', '/items/images/', data, headers)
+
+    def check_image_status():
+        response_data = send_request('GET', f"/items/images/{prompt_response_data['data']['id']}", headers=headers)
+        if response_data['data']['status'] in ['completed', 'failed']:
+            # pprint.pp(response_data['data']['upscaled_urls'])
+            url_list = response_data['data']['upscaled_urls']
+            return True, url_list
+        else:
+            return False, "image not found"
+
+    while True:
+        completed, url_list = check_image_status()
+        if completed:
+            return url_list
+        time.sleep(5)
 
 @st.cache_data(show_spinner=False)
 def generate_image_prompt(main_title, sub_title):
@@ -611,23 +646,14 @@ def generate_image_prompt(main_title, sub_title):
 @st.cache_data(show_spinner=False)
 
 def retreive_img_bytes(image_url):
-    url = "https://api.thenextleg.io/getImage"
-
-    payload = json.dumps({
-        "imgUrl": image_url
-    })
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/arraybuffer',
-        'Authorization': 'Bearer 65f250e1-1499-4c2f-967a-8251c7d05ad8'
-    }
-
-    response = requests.request("POST", url, headers=headers, data=payload)
-
-    binary_data = response.content
-    image_stream = io.BytesIO(binary_data)
-    binary = binary_data = image_stream.getvalue()
-    return binary
+    try:
+        response = requests.get(image_url)
+        if response.status_code == 200:
+            return response.content
+        else:
+            return "Image not found"
+    except Exception as e:
+        return "image not found"
 
 @st.cache_data(show_spinner=False)
 def post_image_wordpress(username, password, site_url, binary_data):
@@ -753,6 +779,7 @@ def main_format(scrap_result, url):
                 else:    
                     response_dict[image] = random.choice(image_url_list)
                     response_dict[image_dump] = ','.join(image_url_list)
+                st.write(f"Slide {index} created")    
                 
 
 
@@ -760,7 +787,7 @@ def main_format(scrap_result, url):
         st.write(new_list)
         save_data_to_mysql(new_list)
         new_list = []
-        sleep(5000)
+        sleeep(5000)
     return new_list  
 
 @st.cache_data(show_spinner=False)
@@ -780,7 +807,7 @@ def bulk_upload(urls_list):
             # save_data_to_mysql(responses)
         else:
             st.error("Data extraction failed.")
-            time.sleep(20)                
+            time.sleep(10)                
 
 @st.cache_data(show_spinner=False)
 def save_data_to_mysql(data_list):
@@ -840,6 +867,7 @@ def main():
     
     
                 with st.spinner("Processing data..."):
+                    st.write("Running ....")
                     bulk_upload(urls_list)
                 st.success("Process Done")                
     # else:
