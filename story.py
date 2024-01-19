@@ -578,7 +578,6 @@ def sleeep(milliseconds):
     # except requests.exceptions.RequestException as e:
     #     # print(f"Error making API request: {e}")
     #     return "image not found"
-@st.cache_data(show_spinner=False)            
 def send_request(method, path, body=None, headers={}):
     conn = http.client.HTTPSConnection("demo.imagineapi.dev")
     conn.request(method, path, body=json.dumps(body) if body else None, headers=headers)
@@ -587,7 +586,6 @@ def send_request(method, path, body=None, headers={}):
     conn.close()
     return data
 
-@st.cache_data(show_spinner=False)
 def generate_image(prompt):
     data = {
         "prompt": prompt,
@@ -607,7 +605,7 @@ def generate_image(prompt):
             url_list = response_data['data']['upscaled_urls']
             return True, url_list
         else:
-            return False, "image not found"
+            return False, []
 
     while True:
         completed, url_list = check_image_status()
@@ -651,9 +649,9 @@ def retreive_img_bytes(image_url):
         if response.status_code == 200:
             return response.content
         else:
-            return "Image not found"
+            return 
     except Exception as e:
-        return "image not found"
+        return 
 
 @st.cache_data(show_spinner=False)
 def post_image_wordpress(username, password, site_url, binary_data):
@@ -694,18 +692,27 @@ def generate_final_wordressl_ink(main_title, sub_title):
     image_prompt = (generate_image_prompt(main_title, sub_title))
     print(image_prompt)
     image_url_list = generate_image(image_prompt + " --aspect 9:16 --no text, heading, watermark, words, letters, typography, slogans, signature ")
+    # print("image generated")
     # image_url = random.choice(image_url_list)
     wordpress_img_url_list = []
     if image_url_list is None:
+        print("image url list none")
         return 0
     else:
+        # print("else")
         for image_url in image_url_list:
+            # print("byte generation")
             binary_data = retreive_img_bytes(image_url)
             username = 'sarthak'
             password = 'uwrM 9UeW QF0n 5wGw nlWk Ye55'
             site_url = 'https://pharmeasy.in/story'
-            wordpress_img_url = post_image_wordpress(username, password, site_url, binary_data)
-            wordpress_img_url_list.append(wordpress_img_url)
+            try:
+                wordpress_img_url = post_image_wordpress(username, password, site_url, binary_data)
+                wordpress_img_url_list.append(wordpress_img_url)
+            except:
+                wordpress_img_url_list.append("image not found something went wrong")
+
+            # print("genetation done and saved to wordpress")
         # wordpress_img_url_list = [link + ".webp" for link in wordpress_img_url_list]
         new_wordpress_img_url_list = []
         for link in wordpress_img_url_list:
@@ -779,7 +786,7 @@ def main_format(scrap_result, url):
                 else:    
                     response_dict[image] = random.choice(image_url_list)
                     response_dict[image_dump] = ','.join(image_url_list)
-                st.write(f"Slide {index} created")    
+                st.write(f"Slide {index + 1} created")    
                 
 
 
