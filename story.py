@@ -772,7 +772,8 @@ def main_format(scrap_result, url):
             section.popitem()
             for index, (heading2, description2) in enumerate(section.items()):
                 # keyword = generate_keyword(heading2)
-
+                if index + 1 >= 11 :
+                    break;
                 heading1 = f"heading{index + 1}"
                 description1 = f"description{index + 1}"
                 image_dump = f"image{index+1}_dump"
@@ -787,6 +788,7 @@ def main_format(scrap_result, url):
                     response_dict[image] = random.choice(image_url_list)
                     response_dict[image_dump] = ','.join(image_url_list)
                 st.write(f"Slide {index + 1} created")    
+                
                 
 
 
