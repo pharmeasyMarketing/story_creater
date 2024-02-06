@@ -780,13 +780,15 @@ def main_format(scrap_result, url):
                 image = f"image{index+1}"
                 response_dict[heading1] = heading2
                 response_dict[description1] = description2
-                image_url_list = generate_final_wordressl_ink(title, heading2)
-                if image_url_list == 0:
-                    response_dict[image] = "Image not found"
-                    response_dict[image_dump] = "image not found something went wrong"
-                else:    
-                    response_dict[image] = random.choice(image_url_list)
-                    response_dict[image_dump] = ','.join(image_url_list)
+                response_dict[image] = " "
+                response_dict[image_dump] = " "
+                # image_url_list = generate_final_wordressl_ink(title, heading2)
+                # if image_url_list == 0:
+                #     response_dict[image] = "Image not found"
+                #     response_dict[image_dump] = "image not found something went wrong"
+                # else:    
+                #     response_dict[image] = random.choice(image_url_list)
+                #     response_dict[image_dump] = ','.join(image_url_list)
                 st.write(f"Slide {index + 1} created")    
                 
                 
