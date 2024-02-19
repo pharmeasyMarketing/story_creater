@@ -345,7 +345,7 @@ def generate_responses(scrap_dict):
             response = gpt_response["choices"][0]["message"]["content"].strip()
             response = response
 
-
+        response_dict = {}
         try:
             response_dict = eval(response)
             response_dict["section_dump"] = scrap_dict[heading]
