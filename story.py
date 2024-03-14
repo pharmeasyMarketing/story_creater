@@ -1,3 +1,5 @@
+# using as of march without automated images
+
 import requests
 from bs4 import BeautifulSoup
 import openai
@@ -12,6 +14,9 @@ from PIL import Image
 import http.client
 import io
 from tempfile import NamedTemporaryFile
+import pytz
+from datetime import datetime
+
 
 @st.cache_data(show_spinner=False)
 def med_extract(url):
@@ -725,6 +730,38 @@ def generate_final_wordressl_ink(main_title, sub_title):
         return new_wordpress_img_url_list
 
 # ---------------------------------midjourney imag end ---------------------------------
+def extract_drname_link(url):
+    class_name = "box_des box_des_one d_f"
+    response = requests.get(url)
+    if response.status_code != 200:
+        print(f"Failed to retrieve the content from {url}")
+        return None
+    soup = BeautifulSoup(response.text, 'html.parser')
+    div_tag = soup.find('div', class_=class_name)
+
+    if div_tag:
+        a_tag = div_tag.find('a')
+        if a_tag:
+            
+            a_link = a_tag.get('href')
+            return a_link
+        else:
+            print(f"No <a> tag found inside <div> tag with class '{class_name}' on {url}")
+            return "https://pharmeasy.in/legal/editorial-policy"
+    else:
+        print(f"No <div> tag with class '{class_name}' found on {url}")
+        return "https://pharmeasy.in/legal/editorial-policy"    
+
+def published_time():
+    current_time = datetime.now()
+
+    # Convert current time to a specific timezone
+    timezone = pytz.timezone('Asia/Kolkata')
+    current_time = timezone.localize(current_time)
+
+    # Format the current time
+    formatted_time = current_time.strftime('%Y-%m-%dT%H:%M:%S%z')
+    return formatted_time
 @st.cache_data(show_spinner=False)
 def main_format(scrap_result, url):
 
@@ -742,6 +779,7 @@ def main_format(scrap_result, url):
             response_dict['target_page1'] = url
             response_dict['page_type'] = 'medicine'
             response_dict['status'] = 'draft'
+            
             section.popitem()
             section.popitem()
             for index, (heading2, description2) in enumerate(section.items()):
@@ -768,12 +806,14 @@ def main_format(scrap_result, url):
             response_dict['target_page1'] = blog_slug_trimming(url)
             response_dict['page_type'] = 'blog'
             response_dict['status'] = 'draft'
+            response_dict['reviewer_link'] = extract_drname_link(url)
+            response_dict['published_on'] = published_time()
             section.popitem()
             section.popitem()
             for index, (heading2, description2) in enumerate(section.items()):
                 # keyword = generate_keyword(heading2)
                 if index + 1 >= 11 :
-                    break;
+                    break
                 heading1 = f"heading{index + 1}"
                 description1 = f"description{index + 1}"
                 image_dump = f"image{index+1}_dump"
