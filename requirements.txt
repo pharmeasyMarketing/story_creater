@@ -7,3 +7,4 @@ streamlit
 mysql.connector
 pandas
 Pillow==8.4.0
+pytz
