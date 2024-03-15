@@ -808,6 +808,7 @@ def main_format(scrap_result, url):
             response_dict['status'] = 'draft'
             response_dict['reviewer_link'] = extract_drname_link(url)
             response_dict['published_on'] = published_time()
+            response_dict['modified_on'] = published_time()
             section.popitem()
             section.popitem()
             for index, (heading2, description2) in enumerate(section.items()):
